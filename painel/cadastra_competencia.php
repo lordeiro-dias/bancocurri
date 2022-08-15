@@ -9,7 +9,7 @@
     }
     include 'conecta.php';
 
-    $habilidade = $_POST['habilidade'];
+    $competencia = $_POST['competencias'];
     
 
     // echo "Nome => $nome_aluno <br>";
@@ -17,15 +17,15 @@
     // echo "Telefone => $telefone <br>";
     // echo "Curso => $curso <br>";
 
-    $consulta = "INSERT INTO habilidades (habilidade) VALUES ('$habilidade')";
+    $consulta = "INSERT INTO competencias (competencia) VALUES ('$competencia')";
 
     $conexao->query($consulta);
 
     ?>
 
     <script type="text/javascript">
-        alert("Habilidade cadastrada. Cadastre suas competências");
-        window.location.href = "habilidades.php";
+        alert("Competência cadastrada. Cadastre sua Educação");
+        window.location.href = "educacao.php";
         
     </script> 
 

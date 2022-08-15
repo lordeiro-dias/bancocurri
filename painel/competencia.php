@@ -25,7 +25,6 @@
     <meta name="author" content="">
 
     <title>Painel Administrativo</title>
-    <script src="mascara.min.js"></script>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -198,32 +197,27 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Cadastro de Currículo</h1>                        
+                        <h1 class="h3 mb-0 text-gray-800">Cadastro de Competências</h1>                        
                     </div>
 
+                    <!-- recuperar o ID do curriculo pelo email do usuario-->
+                    <?php
+                        $email = $_SESSION["email_user"];
+                        $sql = "SELECT * FROM curriculo WHERE email = '$email'";
+                        //......
+                    
+                    ?>
+
                     <div class="col-xl-10 col-lg-8 align-items-center">
-                        <form action="cadastra_curriculo.php" method="POST">
-                            <div class="form-group">
-                                <label for="nomeCompleto">Nome Completo</label>
-                                <input name="nome" type="text" class="form-control" id="nomeCompleto" value="<?php echo $_SESSION['nome_user']; ?>">
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="inputEmail4">Email</label>
-                                    <input name="email" type="email" class="form-control" id="inputEmail4" value="<?php echo $_SESSION['email_user']; ?>">
+                        <form action="cadastra_competencia.php" method="POST">
+                            <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Digite sua Competência</label>
+                                    <input name="competencia" type="text" class="form-control" id="competencia" placeholder="digite sua competência">
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="telefone">Telefone</label>
-                                    <input name="telefone" type="text" class="form-control" id="telefone" placeholder="digite somente números"  onkeyup="mascara('(##)# ####-####',this,event,true)" 
-        maxlength="15">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="curso">Nome do Curso</label>
-                                <input name="curso" type="text" class="form-control" id="curso" placeholder="Digite seu curso">
-                            </div>
                             
-                            <button type="submit" class="btn btn-primary">Cadastrar Currículo</button>
+                            
+                            
+                            <button type="submit" class="btn btn-primary">Cadastrar Competência</button>
                         </form>
                     </div>
                     <!-- espaço em branco -->

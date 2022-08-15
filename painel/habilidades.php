@@ -101,7 +101,7 @@
                         <h6 class="collapse-header">Acesso Rápido:</h6>
                         <a class="collapse-item" href="curriculo.php">Cadastrar</a>
                         <a class="collapse-item" href="habilidades.php">Habilidades</a>
-                        <a class="collapse-item" href="#">Competências</a>
+                        <a class="collapse-item" href="competencia.php">Competências</a>
                         <a class="collapse-item" href="#">Educação</a>
                         <a class="collapse-item" href="#">Experiência</a>
                         <a class="collapse-item" href="dados_pessoais.php">Dados Pessoais</a>
