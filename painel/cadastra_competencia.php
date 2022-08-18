@@ -9,7 +9,7 @@
     }
     include 'conecta.php';
 
-    $competencia = $_POST['competencias'];
+    $competencia = $_POST['competencia'];
     
 
     // echo "Nome => $nome_aluno <br>";
