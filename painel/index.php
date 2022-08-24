@@ -1,18 +1,41 @@
 <?php
     session_start();
-    if((!isset($_SESSION['id_user']) == true) and (!isset($_SESSION['nome_user']) == true) and (!isset($_SESSION['tipo_user']) == true) and (!isset($_SESSION['email_user']) == true)){
+    if((!isset($_SESSION['id_user']) == true) and (!isset($_SESSION['nome_user']) == true) and (!isset($_SESSION['tipo_user']) == true) and (!isset($_SESSION['email_user']) == true) and (!isset($_SESSION['cpf_user']) == true)){
         unset($_SESSION['id_user']);
         unset($_SESSION['nome_user']);
         unset($_SESSION['email_user']);
         unset($_SESSION['tipo_user']);
+        unset($_SESSION['cpf_user']);
         header('Location: login.php');
     }
     include 'conecta.php';
 
+
+    //Consultas para habilitar ou desabilitar ítens do menu e botões
+    
+    // consulta em SQL que será executada na base de dados
+    $email = $_SESSION['email_user'];
+    $sql = "SELECT * FROM curriculo WHERE email='$email'";
+
+    // armazena o resultado da consulta
+    $resultado = mysqli_query($conexao, $sql);
+
+    $id_curriculo = "";
+    $conteudo_nome="";
+
+    if (mysqli_num_rows($resultado) > 0) {
+        // saída de dados de cada linha da tabela
+         
+        while($linha = mysqli_fetch_assoc($resultado)) {
+            $id_curriculo = $linha["id_curr"];
+            $conteudo_nome= $linha["nome"];
+            //echo $linha["nome"];
+        }
+    }
+    else{
+        echo "Nenhum dado encontrado!";
+    }
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -87,6 +110,8 @@
                 </div>
             </li>
 
+
+
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -97,13 +122,27 @@
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
+
                         <h6 class="collapse-header">Acesso Rápido:</h6>
-                        <a class="collapse-item" href="curriculo.php">Cadastrar</a>
-                        <a class="collapse-item" href="habilidades.php">Habilidades</a>
-                        <a class="collapse-item" href="#">Competências</a>
-                        <a class="collapse-item" href="#">Educação</a>
-                        <a class="collapse-item" href="#">Experiência</a>
-                        <a class="collapse-item" href="dados_pessoais.php">Dados Pessoais</a>
+                        <!-- AQUI ENTRA O SCRIPT EM PHP PARA HABILITAR/DESABILITAR MENUS SE O CURRICULO JÁ ESTIVER PREENCHIDO OU NÃO! -->
+                        <?php
+                            if($conteudo_nome !== ''){
+                                echo "  <a class=\"collapse-item\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">
+                                            Cadastrar
+                                        </a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Competências</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Educação</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Experiência</a>";
+                                echo "  <a class=\"collapse-item\" href=\"dados_pessoais.php\">Dados Pessoais</a>";
+                                echo "  <a class=\"collapse-item\" href=\"ver_curriculo.php\">Ver Curriculo</a>"; 
+                            }else{
+                                echo "  <a class=\"collapse-item\" href=\"curriculo.php\">Cadastrar</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Competências</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Educação</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Experiência</a>";
+                                echo "  <a class=\"collapse-item\" href=\"dados_pessoais.php\">Dados Pessoais</a>";
+                            }    
+                        ?>
                     </div>
                 </div>
             </li>
@@ -163,6 +202,25 @@
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
+<?php
+    $tipo_usuario = $_SESSION['tipo_user'];
+    $tipo_acesso = '';
+    if ($tipo_usuario == 1){
+        $tipo_acesso = "Administrativo";
+    }elseif($tipo_usuario == 2){
+        $tipo_acesso = "Aluno";
+    }else{
+        $tipo_acesso = "Empresa";
+    }
+?>
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Acesso para <b><?php echo $tipo_acesso; ?></b></span>
+                                
+                            </a>
+                        </li>
+    <div class="topbar-divider d-none d-sm-block"></div>
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -239,7 +297,7 @@
                         </div>
                         <!-- Earnings (Monthly) Card Example -->
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card border-left-warning shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
@@ -256,7 +314,7 @@
                         </div>
                         <!-- Earnings (Monthly) Card Example -->
                         <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card border-left-danger shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
@@ -302,14 +360,21 @@
                                     <tbody>
 <?php
     // consulta em SQL que será executada na base de dados
-    $sql = "SELECT * FROM curriculo";
+    $email = $_SESSION['email_user'];
+    $sql = "SELECT * FROM curriculo WHERE email='$email'";
 
     // armazena o resultado da consulta
     $resultado = mysqli_query($conexao, $sql);
 
+    $id_curriculo = "";
+    $conteudo_nome="";
+
     if (mysqli_num_rows($resultado) > 0) {
         // saída de dados de cada linha da tabela
+         
         while($linha = mysqli_fetch_assoc($resultado)) {
+            $id_curriculo = $linha["id_curr"];
+            $conteudo_nome= $linha["nome"];
 ?>
                                         <tr>
                                             <td><?php echo $linha["id_curr"]; ?></td>
@@ -326,16 +391,32 @@
             echo "0 resultados";
         }
     
-        // Fechar a conexão
-?>        
-
-
-
-                                                                               
+        
+?>                                                                                  
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+<?php
+    if($conteudo_nome !== ''){
+        
+        echo "<p class=\"card-header py-3\" style=\"color:red\">CURRÍCULO CADASTRADO!</p>";
+
+        
+    }else{
+        echo "  <a href=\"curriculo.php\" class=\"btn btn-primary btn-icon-split\" id=\"btn_cadastrar\">
+                    <span class=\"text\">Cadastrar Curriculo</span>
+                </a>";
+    }    
+?>
+
+<!-- COLOCAR AQUI PARA HABILITAR OU DESABILITAR OS CADASTROS DE HABILIDADES, COMPETENCIAS, EDUCAÇÃO E EXPERIENCIA 
+SE O USUARIO TIVER CURRICULO JÁ CADASTRADO! -->
+
+<?php
+    if($conteudo_nome !== ''){
+        //MOSTRA DIVS
+?>                     
                     </div>
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
@@ -355,7 +436,7 @@
                                     <tbody>
 <?php
     // consulta em SQL que será executada na base de dados
-    $sql = "SELECT * FROM habilidades";
+    $sql = "SELECT * FROM habilidades WHERE id_curr = '$id_curriculo'";
 
     // armazena o resultado da consulta
     $resultado = mysqli_query($conexao, $sql);
@@ -368,21 +449,24 @@
                                             <td><?php echo $linha["id_hab"]; ?></td>
                                             <td><?php echo $linha["habilidade"]; ?></td>
                                         </tr> 
-
 <?php
             
         }
         } else {
-            echo "0 resultados";
+            echo "<p style=\"color:red\">Nenhuma Habilidade Cadastrada!</p>";
         }
     
-        // Fechar a conexão
-?>                                          
+        
+?>                                        
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                        <a href="habilidades.php" class="btn btn-primary btn-icon-split">
+                            <span class="text">Cadastrar Outra Habilidade</span>
+                        </a>
                     </div>
+                    
 
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
@@ -395,14 +479,14 @@
                                     <thead>
                                         <tr>
                                             <th>ID_COMP</th>
-                                            <th>Competencia</th>
+                                            <th>Competência</th>
                                         </tr>
                                     </thead>
                                     
                                     <tbody>
 <?php
     // consulta em SQL que será executada na base de dados
-    $sql = "SELECT * FROM competencias";
+    $sql = "SELECT * FROM competencias WHERE id_curr = '$id_curriculo'";
 
     // armazena o resultado da consulta
     $resultado = mysqli_query($conexao, $sql);
@@ -415,20 +499,19 @@
                                             <td><?php echo $linha["id_comp"]; ?></td>
                                             <td><?php echo $linha["competencia"]; ?></td>
                                         </tr> 
-
 <?php
-            
         }
         } else {
-            echo "0 resultados";
+            echo "<p style=\"color:red\">Nenhuma Competência Cadastrada!</p>";
         }
-    
-        // Fechar a conexão 
-?>                                                
+?>                                        
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                        <a href="competencias.php" class="btn btn-primary btn-icon-split">
+                            <span class="text">Cadastrar Outra Competência</span>
+                        </a>
                     </div>
 
                     <!-- DataTales Example -->
@@ -442,17 +525,17 @@
                                     <thead>
                                         <tr>
                                             <th>ID_EDUC</th>
-                                            <th>Institução</th>
+                                            <th>Instituição</th>
                                             <th>Curso</th>
-                                            <th>Inicio</th>
-                                            <th>Fim</th>
+                                            <th>Data Inicio</th>
+                                            <th>Data Fim</th>
                                         </tr>
                                     </thead>
                                     
                                     <tbody>
 <?php
     // consulta em SQL que será executada na base de dados
-    $sql = "SELECT * FROM educacao";
+    $sql = "SELECT * FROM educacao WHERE id_curr = '$id_curriculo'";
 
     // armazena o resultado da consulta
     $resultado = mysqli_query($conexao, $sql);
@@ -468,20 +551,22 @@
                                             <td><?php echo $linha["inicio"]; ?></td>
                                             <td><?php echo $linha["fim"]; ?></td>
                                         </tr> 
-
 <?php
             
         }
         } else {
-            echo "0 resultados";
+            echo "<p style=\"color:red\">Nenhuma Instituição de Ensino Cadastrada!</p>";
         }
     
-        // Fechar a conexão
-?>                                              
+        
+?>                                        
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                        <a href="educacao.php" class="btn btn-primary btn-icon-split">
+                            <span class="text">Cadastrar Outra Educação</span>
+                        </a>
                     </div>
 
                     <!-- DataTales Example -->
@@ -497,22 +582,26 @@
                                             <th>ID_EXP</th>
                                             <th>Empresa</th>
                                             <th>Ocupação</th>
-                                            <th>Inicio</th>
-                                            <th>Fim</th>
+                                            <th>Data Inicio</th>
+                                            <th>Data Fim</th>
                                         </tr>
                                     </thead>
                                     
                                     <tbody>
 <?php
-    // consulta em SQL que será executada na base de dados
-    $sql = "SELECT * FROM experiencias";
+// Incluir o arquivo de conexão sempre que precisar acessar o SGBD
+include 'conecta.php';
 
-    // armazena o resultado da consulta
-    $resultado = mysqli_query($conexao, $sql);
+// consulta em SQL que será executada na base de dados
+$sql = "SELECT * FROM experiencias WHERE id_curr = '$id_curriculo'";
 
-    if (mysqli_num_rows($resultado) > 0) {
-        // saída de dados de cada linha da tabela
-        while($linha = mysqli_fetch_assoc($resultado)) {
+// armazena o resultado da consulta
+$resultado = mysqli_query($conexao, $sql);
+
+if (mysqli_num_rows($resultado) > 0) {
+// saída de dados de cada linha da tabela
+    while($linha = mysqli_fetch_assoc($resultado)) {
+
 ?>
                                         <tr>
                                             <td><?php echo $linha["id_exp"]; ?></td>
@@ -520,26 +609,37 @@
                                             <td><?php echo $linha["ocupacao"]; ?></td>
                                             <td><?php echo $linha["inicio"]; ?></td>
                                             <td><?php echo $linha["fim"]; ?></td>
-                                        </tr> 
-
+                                        </tr>
 <?php
-            
-        }
-        } else {
-            echo "0 resultados";
-        }
-    
-        // Fechar a conexão
-        mysqli_close($conexao);
-?>                                               
+}
+} else {
+    echo "<p style=\"color:red\">Nenhuma Experiência Profissional Cadastrada!</p>";
+}
+
+// Fechar a conexão
+mysqli_close($conexao);
+
+
+?>
+                                   
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                        <a href="experiencia.php" class="btn btn-primary btn-icon-split">
+                            <span class="text">Cadastrar Outra Experiência</span>
+                        </a>
                     </div>
+                    
 
                 </div>
                 <!-- /.container-fluid -->
+<?php    
+    }
+    else {
+        echo "<p style=\"color:red\">Você precisa cadastrar um currículo!</p>";
+    }
+?> 
 
             </div>
             <!-- End of Main Content -->
@@ -595,13 +695,7 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
 
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
-
+   
 </body>
 
 </html>

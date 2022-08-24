@@ -1,13 +1,38 @@
 <?php
     session_start();
-    if((!isset($_SESSION['id_user']) == true) and (!isset($_SESSION['nome_user']) == true) and (!isset($_SESSION['tipo_user']) == true) and (!isset($_SESSION['email_user']) == true)){
+    if((!isset($_SESSION['id_user']) == true) and (!isset($_SESSION['nome_user']) == true) and (!isset($_SESSION['tipo_user']) == true) and (!isset($_SESSION['email_user']) == true) and (!isset($_SESSION['cpf_user']) == true)){
         unset($_SESSION['id_user']);
         unset($_SESSION['nome_user']);
         unset($_SESSION['email_user']);
         unset($_SESSION['tipo_user']);
+        unset($_SESSION['cpf_user']);
         header('Location: login.php');
     }
     include 'conecta.php';
+    //Consultas para habilitar ou desabilitar ítens do menu e botões
+    
+    // consulta em SQL que será executada na base de dados
+    $email = $_SESSION['email_user'];
+    $sql = "SELECT * FROM curriculo WHERE email='$email'";
+
+    // armazena o resultado da consulta
+    $resultado = mysqli_query($conexao, $sql);
+
+    $id_curriculo = "";
+    $conteudo_nome="";
+
+    if (mysqli_num_rows($resultado) > 0) {
+        // saída de dados de cada linha da tabela
+         
+        while($linha = mysqli_fetch_assoc($resultado)) {
+            $id_curriculo = $linha["id_curr"];
+            $conteudo_nome= $linha["nome"];
+            //echo $linha["nome"];
+        }
+    }
+    else{
+        echo "Nenhum dado encontrado!";
+    }
 
 ?>
 
@@ -25,7 +50,6 @@
     <meta name="author" content="">
 
     <title>Painel Administrativo</title>
-    <script src="mascara.min.js"></script>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -35,6 +59,8 @@
 
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <script src="js/mascara.min.js"></script>
+    
     
 
 </head>
@@ -100,12 +126,24 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Acesso Rápido:</h6>
-                        <a class="collapse-item" href="curriculo.php">Cadastrar</a>
-                        <a class="collapse-item" href="habilidades.php">Habilidades</a>
-                        <a class="collapse-item" href="competencia.php">Competências</a>
-                        <a class="collapse-item" href="#">Educação</a>
-                        <a class="collapse-item" href="#">Experiência</a>
-                        <a class="collapse-item" href="dados_pessoais.php">Dados Pessoais</a>
+                        <!-- AQUI ENTRA O SCRIPT EM PHP PARA HABILITAR/DESABILITAR MENUS SE O CURRICULO JÁ ESTIVER PREENCHIDO OU NÃO! -->
+                        <?php
+                            if($conteudo_nome !== ''){
+                                echo "  <a class=\"collapse-item\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">
+                                            Cadastrar
+                                        </a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Competências</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Educação</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Experiência</a>";
+                                echo "  <a class=\"collapse-item\" href=\"dados_pessoais.php\">Dados Pessoais</a>"; 
+                            }else{
+                                echo "  <a class=\"collapse-item\" href=\"curriculo.php\">Cadastrar</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Competências</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Educação</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Experiência</a>";
+                                echo "  <a class=\"collapse-item\" href=\"dados_pessoais.php\">Dados Pessoais</a>";
+                            }    
+                        ?>
                     </div>
                 </div>
             </li>
@@ -205,17 +243,16 @@
                         <form action="cadastra_curriculo.php" method="POST">
                             <div class="form-group">
                                 <label for="nomeCompleto">Nome Completo</label>
-                                <input name="nome" type="text" class="form-control" id="nomeCompleto" value="<?php echo $_SESSION['nome_user']; ?>">
+                                <input name="nome" type="text" class="form-control" id="nomeCompleto" value="<?php echo $_SESSION['nome_user']; ?>" readonly>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="inputEmail4">Email</label>
-                                    <input name="email" type="email" class="form-control" id="inputEmail4" value="<?php echo $_SESSION['email_user']; ?>">
+                                    <input name="email" type="email" class="form-control" id="inputEmail4" value="<?php echo $_SESSION['email_user']; ?>" readonly>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="telefone">Telefone</label>
-                                    <input name="telefone" type="text" class="form-control" id="telefone" placeholder="digite somente números"  onkeyup="mascara('(##)# ####-####',this,event,true)" 
-        maxlength="15">
+                                    <input name="telefone" type="text" class="form-control" id="telefone" placeholder="digite somente números" onkeyup="mascara('(##)# ####-####',this,event,true)" maxlength="15">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -223,7 +260,7 @@
                                 <input name="curso" type="text" class="form-control" id="curso" placeholder="Digite seu curso">
                             </div>
                             
-                            <button type="submit" class="btn btn-primary">Cadastrar Currículo</button>
+                            <button id="btn_cadastrar" type="submit" class="btn btn-primary">Cadastrar Currículo</button>
                         </form>
                     </div>
                     <!-- espaço em branco -->
@@ -287,12 +324,8 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
 
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+    
+    
 
 </body>
 

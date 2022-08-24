@@ -1,6 +1,6 @@
 <?php
 
-    $valor = "123";
+    $valor = "4321";
 
     $senha_cripto = md5($valor);
 

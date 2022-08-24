@@ -33,7 +33,6 @@
     else{
         echo "Nenhum dado encontrado!";
     }
-
 ?>
 
 
@@ -59,7 +58,7 @@
 
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
-    <script src="js/mascara.min.js"></script>
+    
 
 </head>
 
@@ -113,8 +112,6 @@
                 </div>
             </li>
 
-
-
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -125,7 +122,6 @@
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-
                         <h6 class="collapse-header">Acesso Rápido:</h6>
                         <!-- AQUI ENTRA O SCRIPT EM PHP PARA HABILITAR/DESABILITAR MENUS SE O CURRICULO JÁ ESTIVER PREENCHIDO OU NÃO! -->
                         <?php
@@ -256,37 +252,53 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Meus Dados Pessoais</h1>                        
+                        <h1 class="h3 mb-0 text-gray-800">Cadastro de Competências</h1>                        
                     </div>
 
+                    <!-- recuperar o ID do curriculo pelo email do usuario-->
+                    <?php
+                        // consulta em SQL que será executada na base de dados
+                        $email = $_SESSION['email_user'];
+                        $sql = "SELECT * FROM curriculo WHERE email = '$email'";
+                        // armazena o resultado da consulta
+                        $resultado = mysqli_query($conexao, $sql);
+
+                        if (mysqli_num_rows($resultado) > 0) {
+                            $id_curriculo = "";
+                            while($linha = mysqli_fetch_assoc($resultado)) {
+                                //echo "id curriculo: " . $linha["id_curr"]. "<br>";
+                                $id_curriculo = $linha["id_curr"];
+                            }
+                        } else {
+                            echo "0 resultados";
+                        }
+                    
+                    ?>
+
                     <div class="col-xl-10 col-lg-8 align-items-center">
-                        <form>
+                        <form action="cadastra_competencia.php" method="POST">
+
+                            <!-- este campo não precisa ser exibido para o usuário -->
+                            <!-- Só serve para receber o id_curriculo e enviar para o cadastro de habilidades -->
                             <div class="form-group">
-                                <label for="nomeCompleto">Nome Completo</label>
-                                <input type="text" class="form-control" id="nomeCompleto" value="<?php echo $_SESSION['nome_user']; ?>">
+                                <label for="id_curriculo">Id Curriculo</label>
+                                <input name="id_curriculo" type="text" class="form-control" id="id_curriculo" value="<?php echo $id_curriculo;?>" >
                             </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="inputEmail4">Email</label>
-                                    <input type="email" class="form-control" id="inputEmail4" value="<?php echo $_SESSION['email_user']; ?>">
+                            <!-- este campo não precisa ser exibido para o usuário -->
+
+
+                            <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Digite sua competência</label>
+                                    <input name="competencia" type="text" class="form-control" id="competencia" placeholder="digite sua competência">
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="cpf">CPF</label>
-                                    <input type="text" class="form-control" id="cpf" value="<?php echo $_SESSION['cpf_user']; ?>" onkeyup="mascara('###.###.###-##',this,event,true)" maxlength="14">
-                                </div>
-                            </div>
                             
-                            <button type="submit" class="btn btn-primary">Alterar</button>
+                            
+                            
+                            <button type="submit" class="btn btn-primary">Cadastrar Competência</button>
                         </form>
                     </div>
                     <!-- espaço em branco -->
-                    <div class="row">
-                        <p></p>
-                    </div>
-                    <!-- fim espaço em branco -->
-                    <div class="col-xl-8 col-lg-7">
-                        <button type="button" class="btn btn-primary">ALTERAR SENHA</button>
-                    </div>
+                    
                    
 
                 </div>
@@ -346,12 +358,7 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
 
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+    
 
 </body>
 

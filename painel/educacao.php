@@ -1,14 +1,38 @@
 <?php
     session_start();
-    if((!isset($_SESSION['id_user']) == true) and (!isset($_SESSION['nome_user']) == true) and (!isset($_SESSION['tipo_user']) == true) and (!isset($_SESSION['email_user']) == true)){
+    if((!isset($_SESSION['id_user']) == true) and (!isset($_SESSION['nome_user']) == true) and (!isset($_SESSION['tipo_user']) == true) and (!isset($_SESSION['email_user']) == true) and (!isset($_SESSION['cpf_user']) == true)){
         unset($_SESSION['id_user']);
         unset($_SESSION['nome_user']);
         unset($_SESSION['email_user']);
         unset($_SESSION['tipo_user']);
+        unset($_SESSION['cpf_user']);
         header('Location: login.php');
     }
     include 'conecta.php';
+    //Consultas para habilitar ou desabilitar ítens do menu e botões
+    
+    // consulta em SQL que será executada na base de dados
+    $email = $_SESSION['email_user'];
+    $sql = "SELECT * FROM curriculo WHERE email='$email'";
 
+    // armazena o resultado da consulta
+    $resultado = mysqli_query($conexao, $sql);
+
+    $id_curriculo = "";
+    $conteudo_nome="";
+
+    if (mysqli_num_rows($resultado) > 0) {
+        // saída de dados de cada linha da tabela
+         
+        while($linha = mysqli_fetch_assoc($resultado)) {
+            $id_curriculo = $linha["id_curr"];
+            $conteudo_nome= $linha["nome"];
+            //echo $linha["nome"];
+        }
+    }
+    else{
+        echo "Nenhum dado encontrado!";
+    }
 ?>
 
 
@@ -99,12 +123,24 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Acesso Rápido:</h6>
-                        <a class="collapse-item" href="curriculo.php">Cadastrar</a>
-                        <a class="collapse-item" href="habilidades.php">Habilidades</a>
-                        <a class="collapse-item" href="competencia.php">Competências</a>
-                        <a class="collapse-item" href="#">Educação</a>
-                        <a class="collapse-item" href="#">Experiência</a>
-                        <a class="collapse-item" href="dados_pessoais.php">Dados Pessoais</a>
+                        <!-- AQUI ENTRA O SCRIPT EM PHP PARA HABILITAR/DESABILITAR MENUS SE O CURRICULO JÁ ESTIVER PREENCHIDO OU NÃO! -->
+                        <?php
+                            if($conteudo_nome !== ''){
+                                echo "  <a class=\"collapse-item\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">
+                                            Cadastrar
+                                        </a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Competências</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Educação</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\">Experiência</a>";
+                                echo "  <a class=\"collapse-item\" href=\"dados_pessoais.php\">Dados Pessoais</a>"; 
+                            }else{
+                                echo "  <a class=\"collapse-item\" href=\"curriculo.php\">Cadastrar</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Competências</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Educação</a>";
+                                echo "  <a class=\"collapse-item\" href=\"#\" role=\"link\" aria-disabled=\"true\" style=\"display: none;\">Experiência</a>";
+                                echo "  <a class=\"collapse-item\" href=\"dados_pessoais.php\">Dados Pessoais</a>";
+                            }    
+                        ?>
                     </div>
                 </div>
             </li>
@@ -164,6 +200,25 @@
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
+                        <?php
+    $tipo_usuario = $_SESSION['tipo_user'];
+    $tipo_acesso = '';
+    if ($tipo_usuario == 1){
+        $tipo_acesso = "Administrativo";
+    }elseif($tipo_usuario == 2){
+        $tipo_acesso = "Aluno";
+    }else{
+        $tipo_acesso = "Empresa";
+    }
+?>
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Acesso para <b><?php echo $tipo_acesso; ?></b></span>
+                                
+                            </a>
+                        </li>
+                        <div class="topbar-divider d-none d-sm-block"></div>
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -197,27 +252,62 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Cadastro de Competências</h1>                        
+                        <h1 class="h3 mb-0 text-gray-800">Cadastro de Educação</h1>                        
                     </div>
 
                     <!-- recuperar o ID do curriculo pelo email do usuario-->
                     <?php
-                        $email = $_SESSION["email_user"];
+                        // consulta em SQL que será executada na base de dados
+                        $email = $_SESSION['email_user'];
                         $sql = "SELECT * FROM curriculo WHERE email = '$email'";
-                        //......
+                        // armazena o resultado da consulta
+                        $resultado = mysqli_query($conexao, $sql);
+
+                        if (mysqli_num_rows($resultado) > 0) {
+                            $id_curriculo = "";
+                            while($linha = mysqli_fetch_assoc($resultado)) {
+                                //echo "id curriculo: " . $linha["id_curr"]. "<br>";
+                                $id_curriculo = $linha["id_curr"];
+                            }
+                        } else {
+                            echo "0 resultados";
+                        }
                     
                     ?>
 
                     <div class="col-xl-10 col-lg-8 align-items-center">
-                        <form action="cadastra_competencia.php" method="POST">
+                        <form action="cadastra_educacao.php" method="POST">
+
+                            <!-- este campo não precisa ser exibido para o usuário -->
+                            <!-- Só serve para receber o id_curriculo e enviar para o cadastro de habilidades -->
+                            <div class="form-group">
+                                <label for="id_curriculo">Id Curriculo</label>
+                                <input name="id_curriculo" type="text" class="form-control" id="id_curriculo" value="<?php echo $id_curriculo;?>" >
+                            </div>
+                            <!-- este campo não precisa ser exibido para o usuário -->
+
+
                             <div class="form-group col-md-6">
-                                    <label for="inputEmail4">Digite sua Competência</label>
-                                    <input name="competencia" type="text" class="form-control" id="competencia" placeholder="digite sua competência">
-                                </div>
+                                    <label for="inputEmail4">Instituição</label>
+                                    <input name="instituicao" type="text" class="form-control" id="instituicao" placeholder="digite o nome da Instituição">
+                            </div>
+                            <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Digite o curso</label>
+                                    <input name="curso" type="text" class="form-control" id="curso" 
+                                    placeholder="digite o curso">
+                            </div>
+                            <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Digite o Inicio</label>
+                                    <input name="inicio" type="date" class="form-control" id="inicio">
+                            </div>
+                            <div class="form-group col-md-6">
+                                    <label for="inputEmail4">Digite o Fim</label>
+                                    <input name="fim" type="date" class="form-control" id="fim">
+                            </div>
                             
                             
                             
-                            <button type="submit" class="btn btn-primary">Cadastrar Competência</button>
+                            <button type="submit" class="btn btn-primary">Cadastrar Educação</button>
                         </form>
                     </div>
                     <!-- espaço em branco -->
@@ -281,12 +371,7 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
 
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+    
 
 </body>
 

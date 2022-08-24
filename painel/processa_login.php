@@ -20,6 +20,7 @@
         $_SESSION['id_user'] = $resultado_usuario['id'];
         $_SESSION['nome_user'] = $resultado_usuario['nome'];
         $_SESSION['email_user'] = $resultado_usuario['email'];
+        $_SESSION['cpf_user'] = $resultado_usuario['cpf'];
         $_SESSION['tipo_user'] = $resultado_usuario['tipo'];
         header('Location: index.php');
     }

@@ -27,7 +27,7 @@
 
     <script type="text/javascript">
         alert("Curriculo cadastrado. Cadastre suas habilidades");
-        window.location.href = "habilidades.php";
+        window.location.href = "index.php";
         
     </script> 
 

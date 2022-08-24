@@ -9,28 +9,28 @@
     }
     include 'conecta.php';
 
+    
+    
+    $id_curriculo = $_POST['id_curriculo'];
     $competencia = $_POST['competencia'];
     
 
-    // echo "Nome => $nome_aluno <br>";
-    // echo "Email => $email <br>";
-    // echo "Telefone => $telefone <br>";
-    // echo "Curso => $curso <br>";
+    echo "id => $id_curriculo <br>";
+    echo "habilidade => $habilidade <br>";
+    
 
-    $consulta = "INSERT INTO competencias (competencia) VALUES ('$competencia')";
+    $consulta = "INSERT INTO competencias (competencia,id_curr) VALUES ('$competencia','$id_curriculo')";
 
     $conexao->query($consulta);
 
     ?>
 
     <script type="text/javascript">
-        alert("Competência cadastrada. Cadastre sua Educação");
-        window.location.href = "educacao.php";
+        alert("Competencia cadastrada.");
+        window.location.href = "index.php";
         
     </script> 
-
-    
-    
+<?php
 
     //com os dados inseridos levar o usuário para cadastrar Habilidades, Competências, Escolaridade e Experiência Profissional
 

@@ -12,21 +12,24 @@
     
     
     $id_curriculo = $_POST['id_curriculo'];
-    $habilidade = $_POST['habilidade'];
+    $instituicao = $_POST['instituicao'];
+    $curso = $_POST['curso'];
+    $inicio = $_POST['inicio'];
+    $fim = $_POST['fim'];
     
 
-    echo "id => $id_curriculo <br>";
-    echo "habilidade => $habilidade <br>";
+    //echo "id => $id_curriculo <br>";
+    //echo "habilidade => $habilidade <br>";
     
 
-    $consulta = "INSERT INTO habilidades (habilidade,id_curr) VALUES ('$habilidade','$id_curriculo')";
+    $consulta = "INSERT INTO educacao (instituicao,curso,inicio,fim,id_curr) VALUES ('$instituicao','$curso','$inicio','$fim','$id_curriculo')";
 
     $conexao->query($consulta);
 
     ?>
 
     <script type="text/javascript">
-        alert("Habilidade cadastrada.");
+        alert("Educação cadastrada.");
         window.location.href = "index.php";
         
     </script> 
