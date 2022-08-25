@@ -626,7 +626,7 @@ mysqli_close($conexao);
                                 </table>
                             </div>
                         </div>
-                        <a href="experiencia.php" class="btn btn-primary btn-icon-split">
+                        <a href="experiencias.php" class="btn btn-primary btn-icon-split">
                             <span class="text">Cadastrar Outra Experiência</span>
                         </a>
                     </div>
